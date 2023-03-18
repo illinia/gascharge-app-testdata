@@ -1,0 +1,91 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'java-library'
+    id 'maven-publish'
+}
+
+group = 'com.gascharge.taemin'
+version = '0.0.1-SNAPSHOT'
+
+dependencyManagement {
+    imports {
+        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+if (project.hasProperty('dev')) {
+    repositories {
+        mavenLocal()
+    }
+    dependencies {
+        implementation 'com.gascharge.taemin:gascharge-domain-reservation:0.0.1-SNAPSHOT'
+        implementation 'com.gascharge.taemin:gascharge-module-yml:0.0.1-SNAPSHOT'
+    }
+} else if (project.hasProperty('pro')) {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/illinia/gascharge-lib")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    dependencies {
+        implementation 'com.gascharge.taemin:gascharge-domain-reservation:0.0.1-SNAPSHOT'
+        implementation 'com.gascharge.taemin:gascharge-module-yml:0.0.1-SNAPSHOT'
+    }
+} else {
+    dependencies {
+        implementation project(":gascharge-domain-reservation")
+        implementation project(":gascharge-module-yml")
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.26'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
+    testImplementation 'org.projectlombok:lombok:1.18.26'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/illinia/gascharge-lib")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+            }
+        }
+    }
+    publications {
+        gpr(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+jar {
+    enabled = false
+}

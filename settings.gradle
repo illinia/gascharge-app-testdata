@@ -1,0 +1,17 @@
+def includeProject(String moduleName, String moduleType) {
+    def moduleDirName = "gascharge-${moduleType}"
+    def moduleFullName = "${moduleDirName}-${moduleName}"
+    include moduleFullName
+    project(":${moduleFullName}").projectDir = file("../../${moduleDirName}/${moduleFullName}")
+}
+
+[
+        ["reservation", "domain"],
+        ["yml", "module"],
+        ["jpa", "module"],
+        ["common", "common"]
+].each { subproject ->
+    if ("gascharge-${subproject[1]}-${subproject[0]}" != "gascharge-app-testdata") {
+        includeProject(subproject[0], subproject[1])
+    }
+}

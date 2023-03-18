@@ -1,0 +1,12 @@
+batchSize: 100000
+server:
+  port: 8402
+spring:
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    url: jdbc:mysql://localhost:13307/Reservation?rewriteBatchedStatements=true
+    username: root
+    password: 1212
+    driver-class-name: com.mysql.cj.jdbc.Driver
